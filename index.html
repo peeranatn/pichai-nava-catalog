@@ -966,7 +966,7 @@
             const { pairNumber, pla, hu } = item;
             const status = getPairStatus(pla, hu);
             const isSold = status === 'Sold';
-            const price = pla?.['ราคาตั้งขาย (Base)'] || hu?.['ราคาตั้งขาย (Base)'];
+            const price = (pla?.['ราคาตั้งขาย (Base)'] || 0) + (hu?.['ราคาตั้งขาย (Base)'] || 0);
             const priceHtml = isSold
                 ? '<span class="text-red-600 font-bold uppercase tracking-wider text-sm">ขายแล้ว (SOLD)</span>'
                 : `<span class="text-blue-600 font-bold text-lg">${formatPrice(price)}</span>`;
@@ -1029,7 +1029,7 @@
             const { pairNumber, pla, hu } = item;
             const status = getPairStatus(pla, hu);
             const isSold = status === 'Sold';
-            const price = pla?.['ราคาตั้งขาย (Base)'] || hu?.['ราคาตั้งขาย (Base)'];
+            const price = (pla?.['ราคาตั้งขาย (Base)'] || 0) + (hu?.['ราคาตั้งขาย (Base)'] || 0);
             const priceHtml = isSold
                 ? '<span class="text-red-600 font-bold uppercase text-xs tracking-wider">ขายแล้ว (SOLD)</span>'
                 : `<span class="font-bold text-blue-600">${formatPrice(price)}</span>`;
@@ -1083,7 +1083,7 @@
             const { pla, hu } = item;
             const status = getPairStatus(pla, hu);
             const isSold = status === 'Sold';
-            const price = pla?.['ราคาตั้งขาย (Base)'] || hu?.['ราคาตั้งขาย (Base)'];
+            const price = (pla?.['ราคาตั้งขาย (Base)'] || 0) + (hu?.['ราคาตั้งขาย (Base)'] || 0);
 
 
             const vesselPanel = (v, role) => {
