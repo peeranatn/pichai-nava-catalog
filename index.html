@@ -1146,6 +1146,45 @@
             document.body.style.overflow = '';
         }
 
+        const vesselCache = {};
+
+        function openVesselModal(key) {
+            const v = vesselCache[key];
+            if (!v) return;
+            const isSold = v['สถานะ'] === 'Sold';
+            const price = v['ราคาตั้งขาย (Base)'];
+            document.getElementById('pairModalContent').innerHTML = `
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-5">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-gray-700 text-white px-3 py-1 rounded-full text-sm font-bold">เรือเดี่ยว</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">${v['ชื่อเรือ']}</h3>
+                            <span class="text-2xl font-bold ${isSold ? 'text-red-600' : 'text-blue-600'}">${isSold ? 'ขายแล้ว (SOLD)' : formatPrice(price)}</span>
+                        </div>
+                        <button onclick="closePairModal()" class="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-gray-500">เลขทะเบียน</span><span class="font-medium text-gray-800">${v['เลขทะเบียน'] || '-'}</span></div>
+                            <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-gray-500">ตันกรอส</span><span class="font-medium text-gray-800">${v['ตันกรอส'] || '-'}</span></div>
+                            <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-gray-500">ตันเนต</span><span class="font-medium text-gray-800">${v['ตันเนต'] || '-'}</span></div>
+                            <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-gray-500">เครื่องยนต์</span><span class="font-medium text-gray-800">${v['เครื่อง'] || '-'}</span></div>
+                            <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-gray-500">แรงม้า</span><span class="font-medium text-gray-800">${v['แรงม้า/กว.'] || '-'}</span></div>
+                            <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-gray-500">เจ้าของ</span><span class="font-medium text-gray-800">${v['เจ้าของเรือ'] || '-'}</span></div>
+                            <div class="flex justify-between items-center"><span class="text-gray-500">เลขเครื่อง</span><span class="font-medium text-gray-800">${v['เลขเครื่อง'] || '-'}</span></div>
+                        </div>
+                    </div>
+                </div>`;
+            const modal = document.getElementById('pairModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
 
         function formatPrice(price) {
             if (!price) return 'ติดต่อสอบถาม';
@@ -1158,13 +1197,15 @@
         }
 
         function createCard(vessel) {
+            const key = 'vessel-' + Math.round(vessel['ลำดับ']);
+            vesselCache[key] = vessel;
             const isSold = vessel['สถานะ'] === 'Sold';
             const priceHtml = isSold 
                 ? '<span class="text-red-600 font-bold uppercase tracking-wider">ขายแล้ว (SOLD)</span>'
                 : `<span class="text-blue-600 font-bold text-lg">${formatPrice(vessel['ราคาตั้งขาย (Base)'])}</span>`;
             
             return `
-                <div class="vessel-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col ${isSold ? 'opacity-75 grayscale-[0.3]' : ''}">
+                <div class="vessel-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col cursor-pointer ${isSold ? 'opacity-75 grayscale-[0.3]' : ''}" onclick="openVesselModal('${key}')">
                     <div class="h-48 bg-blue-100 flex items-center justify-center relative">
                         <svg class="w-20 h-20 text-blue-300" fill="currentColor" viewBox="0 0 24 24"><path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2.12 1.98 2.48 5.02 2.48 7 0 .98 1.24 2.4 2.12 4 2.12h.05L21 14l-2.1-7h-2.1L12 2 5.2 7H3.1L1 14l2.95 5zM12 5.19l2.7 2.81H9.3L12 5.19zM4.6 14l1.5-5h11.8l1.5 5H4.6z"/></svg>
                         ${isSold ? '<div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40"><span class="bg-red-600 text-white px-6 py-2 rounded-full font-bold text-xl uppercase tracking-widest">ขายแล้ว</span></div>' : ''}
@@ -1194,7 +1235,7 @@
                                 <span class="font-medium text-gray-800">${vessel['เครื่อง'] || '-'}</span>
                             </div>
                         </div>
-                        <button class="w-full bg-gray-900 hover:bg-black text-white py-3 rounded-xl font-medium transition flex items-center justify-center gap-2">
+                        <button type="button" class="w-full bg-gray-900 hover:bg-black text-white py-3 rounded-xl font-medium transition flex items-center justify-center gap-2">
                             <span>ดูรายละเอียด</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         </button>
@@ -1204,13 +1245,15 @@
         }
 
         function createListRow(vessel) {
+            const key = 'vessel-' + Math.round(vessel['ลำดับ']);
+            vesselCache[key] = vessel;
             const isSold = vessel['สถานะ'] === 'Sold';
             const priceHtml = isSold 
                 ? '<span class="text-red-600 font-bold uppercase text-xs tracking-wider">ขายแล้ว (SOLD)</span>'
                 : `<span class="font-bold text-blue-600">${formatPrice(vessel['ราคาตั้งขาย (Base)'])}</span>`;
                 
             return `
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-4 ${isSold ? 'opacity-75 grayscale-[0.3]' : ''}">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:border-gray-300 flex flex-col md:flex-row items-center gap-4 cursor-pointer transition ${isSold ? 'opacity-75 grayscale-[0.3]' : ''}" onclick="openVesselModal('${key}')">
                     <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
                         <svg class="w-6 h-6 text-blue-300" fill="currentColor" viewBox="0 0 24 24"><path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2.12 1.98 2.48 5.02 2.48 7 0 .98 1.24 2.4 2.12 4 2.12h.05L21 14l-2.1-7h-2.1L12 2 5.2 7H3.1L1 14l2.95 5zM12 5.19l2.7 2.81H9.3L12 5.19zM4.6 14l1.5-5h11.8l1.5 5H4.6z"/></svg>
                     </div>
@@ -1235,7 +1278,7 @@
                             ${getStatusBadge(vessel['สถานะ'])}
                         </div>
                     </div>
-                    <button class="w-full md:w-auto bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-lg text-sm font-medium transition">
+                    <button type="button" class="w-full md:w-auto bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-lg text-sm font-medium transition">
                         รายละเอียด
                     </button>
                 </div>
