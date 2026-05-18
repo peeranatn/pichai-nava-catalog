@@ -990,34 +990,6 @@ const vessels = allVessels.filter(v => v['สถานะ'] !== 'Sold');
         // Cache for pair items (used by modal opener)
         const pairCache = {};
 
-        const pairImages = {
-            3: [
-                'resources/tawon10/1.jpg',
-                'resources/tawon10/2.jpg',
-                'resources/tawon10/3.jpg',
-                'resources/tawon11/1.jpg',
-                'resources/tawon11/2.jpg',
-                'resources/tawon11/3.jpg',
-            ],
-            13: [
-                'resources/tawon8/1.jpg',
-                'resources/tawon8/2.jpg',
-                'resources/tawon8/3.jpg',
-                'resources/tawon9/1.jpg',
-                'resources/tawon9/2.jpg',
-                'resources/tawon9/3.jpg',
-            ],
-        };
-        const vesselImages = {
-            49: [
-                'resources/samut8/1.jpg',
-                'resources/samut8/2.jpg',
-                'resources/samut8/3.jpg',
-            ],
-        };
-        let carouselImages = [];
-        let carouselIdx = 0;
-
         function createPairCard(item) {
             pairCache['pair-' + item.pairNumber] = item;
             const { pairNumber, pla, hu } = item;
@@ -1028,15 +1000,11 @@ const vessels = allVessels.filter(v => v['สถานะ'] !== 'Sold');
                 ? '<span class="text-red-600 font-bold uppercase tracking-wider text-sm">ขายแล้ว (SOLD)</span>'
                 : `<span class="text-blue-600 font-bold text-lg">${formatPrice(price)}</span>`;
             const boatSvg = `<svg fill="currentColor" viewBox="0 0 24 24"><path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2.12 1.98 2.48 5.02 2.48 7 0 .98 1.24 2.4 2.12 4 2.12h.05L21 14l-2.1-7h-2.1L12 2 5.2 7H3.1L1 14l2.95 5zM12 5.19l2.7 2.81H9.3L12 5.19zM4.6 14l1.5-5h11.8l1.5 5H4.6z"/></svg>`;
-            const thumbImg = (pairImages[pairNumber] || [])[0];
-            const thumbHtml = thumbImg
-                ? `<img src="${thumbImg}" class="w-full h-full object-cover" />`
-                : `<div class="flex items-end gap-1"><svg class="w-20 h-20 text-blue-300" ${boatSvg.slice(4)}<svg class="w-14 h-14 text-indigo-200 mb-1" ${boatSvg.slice(4)}</div>`;
             return `
                 <div class="pair-card vessel-card bg-white rounded-2xl shadow-sm border-2 border-blue-200 overflow-hidden flex flex-col cursor-pointer ${isSold ? 'opacity-75 grayscale-[0.3]' : ''}"
                      onclick="openPairModal('pair-${pairNumber}')">
-                    <div class="h-48 ${thumbImg ? '' : 'bg-gradient-to-br from-blue-50 to-indigo-100 '}flex items-center justify-center relative overflow-hidden">
-                        ${thumbHtml}
+                    <div class="h-48 bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center relative overflow-hidden">
+                        <div class="flex items-end gap-1"><svg class="w-20 h-20 text-blue-300" ${boatSvg.slice(4)}<svg class="w-14 h-14 text-indigo-200 mb-1" ${boatSvg.slice(4)}</div>
                         <div class="absolute top-3 left-3">
                             <span class="bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-bold tracking-wide">เรือคู่ / คู่</span>
                         </div>
@@ -1144,24 +1112,6 @@ const vessels = allVessels.filter(v => v['สถานะ'] !== 'Sold');
             const isSold = status === 'Sold';
             const price = (pla?.['ราคาตั้งขาย (Base)'] || 0) + (hu?.['ราคาตั้งขาย (Base)'] || 0);
 
-            carouselImages = pairImages[item.pairNumber] || [];
-            carouselIdx = 0;
-            const hasImages = carouselImages.length > 0;
-            const _chevL = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>';
-            const _chevR = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>';
-            const carouselHtml = hasImages ? `
-                <div class="relative rounded-xl overflow-hidden bg-black mb-5" style="aspect-ratio:16/9">
-                    <img id="carouselImg" src="${carouselImages[0]}" class="w-full h-full object-contain" />
-                    <button id="carouselPrev" onclick="carouselNav(-1)" disabled
-                        class="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full w-10 h-10 flex items-center justify-center transition disabled:opacity-30 disabled:cursor-not-allowed">
-                        ${_chevL}
-                    </button>
-                    <button id="carouselNext" onclick="carouselNav(1)"${carouselImages.length <= 1 ? ' disabled' : ''}
-                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full w-10 h-10 flex items-center justify-center transition disabled:opacity-30 disabled:cursor-not-allowed">
-                        ${_chevR}
-                    </button>
-                    <span id="carouselCounter" class="absolute bottom-2 right-3 bg-black bg-opacity-60 text-white text-xs font-medium px-2.5 py-1 rounded-full">1 / ${carouselImages.length}</span>
-                </div>` : '';
 
             const vesselPanel = (v, role) => {
                 if (!v) return `<div class="bg-gray-50 rounded-xl p-4 text-gray-400 text-center py-8">ไม่มีข้อมูล</div>`;
@@ -1204,7 +1154,6 @@ const vessels = allVessels.filter(v => v['สถานะ'] !== 'Sold');
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
-                    ${carouselHtml}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         ${vesselPanel(pla, 'เรือปลา')}
                         ${vesselPanel(hu, 'เรือหู')}
@@ -1225,16 +1174,6 @@ const vessels = allVessels.filter(v => v['สถานะ'] !== 'Sold');
             document.body.style.overflow = '';
         }
 
-        function carouselNav(delta) {
-            const newIdx = carouselIdx + delta;
-            if (newIdx < 0 || newIdx >= carouselImages.length) return;
-            carouselIdx = newIdx;
-            document.getElementById('carouselImg').src = carouselImages[carouselIdx];
-            document.getElementById('carouselCounter').textContent = (carouselIdx + 1) + ' / ' + carouselImages.length;
-            document.getElementById('carouselPrev').disabled = carouselIdx === 0;
-            document.getElementById('carouselNext').disabled = carouselIdx === carouselImages.length - 1;
-        }
-
         const vesselCache = {};
 
         function openVesselModal(key) {
@@ -1242,12 +1181,6 @@ const vessels = allVessels.filter(v => v['สถานะ'] !== 'Sold');
             if (!v) return;
             const isSold = v['สถานะ'] === 'Sold';
             const price = v['ราคาตั้งขาย (Base)'];
-            carouselImages = vesselImages[Math.round(v['ลำดับ'])] || [];
-            carouselIdx = 0;
-            const hasImages = carouselImages.length > 0;
-            const _chevL = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>';
-            const _chevR = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>';
-            const carouselHtml = hasImages ? `<div class="relative rounded-xl overflow-hidden bg-black mb-5" style="aspect-ratio:16/9"><img id="carouselImg" src="${carouselImages[0]}" class="w-full h-full object-contain" /><button id="carouselPrev" onclick="carouselNav(-1)" disabled class="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full w-10 h-10 flex items-center justify-center transition disabled:opacity-30 disabled:cursor-not-allowed">${_chevL}</button><button id="carouselNext" onclick="carouselNav(1)"${carouselImages.length <= 1 ? ' disabled' : ''} class="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full w-10 h-10 flex items-center justify-center transition disabled:opacity-30 disabled:cursor-not-allowed">${_chevR}</button><span id="carouselCounter" class="absolute bottom-2 right-3 bg-black bg-opacity-60 text-white text-xs font-medium px-2.5 py-1 rounded-full">1 / ${carouselImages.length}</span></div>` : '';
             document.getElementById('pairModalContent').innerHTML = `
                 <div class="p-6">
                     <div class="flex justify-between items-start mb-5">
@@ -1263,7 +1196,6 @@ const vessels = allVessels.filter(v => v['สถานะ'] !== 'Sold');
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
-                    ${carouselHtml}
                     <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
                         <div class="space-y-3 text-sm">
                             <div class="flex justify-between border-b border-gray-100 pb-2"><span class="text-gray-500">เลขทะเบียน</span><span class="font-medium text-gray-800">${v['เลขทะเบียน'] || '-'}</span></div>
@@ -1300,15 +1232,10 @@ const vessels = allVessels.filter(v => v['สถานะ'] !== 'Sold');
             const priceHtml = isSold
                 ? '<span class="text-red-600 font-bold uppercase tracking-wider">ขายแล้ว (SOLD)</span>'
                 : `<span class="text-blue-600 font-bold text-lg">${formatPrice(vessel['ราคาตั้งขาย (Base)'])}</span>`;
-            const thumbImg = (vesselImages[Math.round(vessel['ลำดับ'])] || [])[0];
-            const thumbHtml = thumbImg
-                ? `<img src="${thumbImg}" class="w-full h-full object-cover" />`
-                : `<svg class="w-20 h-20 text-blue-300" fill="currentColor" viewBox="0 0 24 24"><path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2.12 1.98 2.48 5.02 2.48 7 0 .98 1.24 2.4 2.12 4 2.12h.05L21 14l-2.1-7h-2.1L12 2 5.2 7H3.1L1 14l2.95 5zM12 5.19l2.7 2.81H9.3L12 5.19zM4.6 14l1.5-5h11.8l1.5 5H4.6z"/></svg>`;
-
             return `
                 <div class="vessel-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col cursor-pointer ${isSold ? 'opacity-75 grayscale-[0.3]' : ''}" onclick="openVesselModal('${key}')">
-                    <div class="h-48 ${thumbImg ? '' : 'bg-blue-100 '}flex items-center justify-center relative overflow-hidden">
-                        ${thumbHtml}
+                    <div class="h-48 bg-blue-100 flex items-center justify-center relative overflow-hidden">
+                        <svg class="w-20 h-20 text-blue-300" fill="currentColor" viewBox="0 0 24 24"><path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2.12 1.98 2.48 5.02 2.48 7 0 .98 1.24 2.4 2.12 4 2.12h.05L21 14l-2.1-7h-2.1L12 2 5.2 7H3.1L1 14l2.95 5zM12 5.19l2.7 2.81H9.3L12 5.19zM4.6 14l1.5-5h11.8l1.5 5H4.6z"/></svg>
                         ${isSold ? '<div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40"><span class="bg-red-600 text-white px-6 py-2 rounded-full font-bold text-xl uppercase tracking-widest">ขายแล้ว</span></div>' : ''}
                         <div class="absolute top-4 right-4">
                             ${getStatusBadge(vessel['สถานะ'])}
