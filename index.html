@@ -40,10 +40,10 @@
                     <button id="filterSingle" class="flex-1 px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 transition">เรือเดี่ยว</button>
                 </div>
                 <div class="flex bg-gray-100 p-1 rounded-lg">
-                    <button id="gridViewBtn" class="p-2 rounded-md bg-white shadow-sm text-blue-600" title="Grid View">
+                    <button id="gridViewBtn" class="p-2 rounded-md text-gray-400 hover:text-gray-600" title="Grid View">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                     </button>
-                    <button id="listViewBtn" class="p-2 rounded-md text-gray-400 hover:text-gray-600" title="List View">
+                    <button id="listViewBtn" class="p-2 rounded-md bg-white shadow-sm text-blue-600" title="List View">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
                     </button>
                 </div>
@@ -928,7 +928,7 @@ const vessels = allVessels.filter(v => v['สถานะ'] !== 'Sold');
         const filterPair = document.getElementById('filterPair');
         const filterSingle = document.getElementById('filterSingle');
 
-        let currentView = 'grid';
+        let currentView = 'list';
         let currentTypeFilter = 'all';
 
         // Pair role data keyed by ลำดับ (integer)
@@ -1348,6 +1348,16 @@ const vessels = allVessels.filter(v => v['สถานะ'] !== 'Sold');
                 return (item['ชื่อเรือ'] || '').toLowerCase().includes(query) ||
                        (item['เครื่อง'] || '').toLowerCase().includes(query) ||
                        (item['ประเภทเรือ'] || '').toLowerCase().includes(query);
+            });
+
+            filteredItems.sort((a, b) => {
+                const priceA = a.type === 'pair'
+                    ? (a.pla?.['ราคาตั้งขาย (Base)'] || 0) + (a.hu?.['ราคาตั้งขาย (Base)'] || 0)
+                    : (a['ราคาตั้งขาย (Base)'] || 0);
+                const priceB = b.type === 'pair'
+                    ? (b.pla?.['ราคาตั้งขาย (Base)'] || 0) + (b.hu?.['ราคาตั้งขาย (Base)'] || 0)
+                    : (b['ราคาตั้งขาย (Base)'] || 0);
+                return priceA - priceB;
             });
 
             render(filteredItems);
